@@ -1,6 +1,51 @@
-export const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-export const todayStr = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
-export const fmtDate = s => { if(!s) return "—"; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("es-GT",{day:"numeric",month:"short",year:"numeric"}); };
-export const fmtDT = iso => iso ? new Date(iso).toLocaleString("es-GT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
-export const slug = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50) || "tarea";
-export const uidq = () => Math.random().toString(36).slice(2,9);
+const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+
+export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+
+const pad = (number) => String(number).padStart(2, "0");
+
+export function todayStr() {
+  const now = new Date();
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+export function fmtDate(value) {
+  if (!value) return "—";
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("es-GT", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function fmtDateTime(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("es-GT", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export function slug(text, fallback = "tarea") {
+  const clean = String(text || "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 50);
+  return clean || fallback;
+}
+
+export const uid = () => crypto.randomUUID().replaceAll("-", "").slice(0, 12);
+
+export const initials = (name) =>
+  String(name || "?")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join("") || "?";
