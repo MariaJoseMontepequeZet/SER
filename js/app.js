@@ -12,11 +12,12 @@ function header() {
   const switcher = state.isAdmin
     ? `<label class="switch"><input type="checkbox" id="asStudent" ${state.asStudent ? "checked" : ""}> Ver como estudiante</label>`
     : "";
+  const logout = state.signOut ? `<button class="ghost" data-act="salir">Cerrar sesión</button>` : "";
   return `<header class="top">
     <div class="brand">
       <div class="logo" aria-hidden="true">B</div>
       <div><h1>Buzón de Tareas</h1><small>${subtitle}</small></div>
-    </div>${switcher}
+    </div><div class="row">${switcher}${logout}</div>
   </header>`;
 }
 
