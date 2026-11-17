@@ -1,8 +1,9 @@
-import { state, tareaById, isBlocked, entregasDeTarea } from "../state.js";
+import { state, tareaById, isBlocked, entregasDeTarea, cuentaDe } from "../state.js";
 import { esc, fmtDate, fmtDateTime } from "../utils.js";
 import { entregasOf } from "../domain.js";
 import { chip, mutedText, pluralize } from "./components.js";
 import { renderEditor } from "./editor.js";
+import { renderProfile } from "./profile.js";
 
 const TABS = [
   ["tareas", "Tareas"],
@@ -12,6 +13,7 @@ const TABS = [
 
 export function renderAdmin() {
   if (state.view === "editor") return renderEditor();
+  if (state.view === "profile") return renderProfile(cuentaDe(state.perfilId));
 
   const tabs = TABS.map(
     ([key, label]) =>
@@ -105,7 +107,7 @@ function cuentaRow(cuenta) {
     <td class="hide-sm num">${fmtDateTime(cuenta.creado)}</td>
     <td>${bloqueada ? chip("bad", "Desactivada") : chip("ok", "Activa")}</td>
     <td><div class="row">
-      <button data-act="renombrar" data-id="${id}">Editar nombre</button>
+      <button data-act="perfil" data-id="${id}">Ver perfil</button>
       <button data-act="alternarBloqueo" data-id="${id}">${bloqueada ? "Activar" : "Desactivar"}</button>
       <button class="danger" data-act="eliminarCuenta" data-id="${id}">Eliminar</button>
     </div></td>
@@ -117,7 +119,7 @@ function tabCuentas() {
     return `<h2>Cuentas</h2>${mutedText("Nadie se ha registrado todavía. Compartí el enlace de esta página con tu grupo.")}`;
   }
   return `<h2>Cuentas</h2>
-    <p class="hint flush">Cada estudiante se registra solo al abrir la página. Desde aquí podés corregir nombres, desactivar o eliminar cuentas.</p>
+    <p class="hint flush">Cada estudiante se registra solo al abrir la página. Desde aquí podés abrir cada perfil, desactivar o eliminar cuentas.</p>
     <div class="table-wrap"><table>
       <thead><tr><th>Estudiante</th><th>Entregas</th><th class="hide-sm">Registro</th><th>Estado</th><th></th></tr></thead>
       <tbody>${state.cuentas.map(cuentaRow).join("")}</tbody>

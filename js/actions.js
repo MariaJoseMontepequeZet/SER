@@ -1,4 +1,4 @@
-import { state, goTo, tareaById, cuentaById, entregasDeTarea } from "./state.js";
+import { state, goTo, tareaById, cuentaById, cuentaDe, entregasDeTarea } from "./state.js";
 import { esc, slug } from "./utils.js";
 import { draftFrom, entregasOf, newPregunta } from "./domain.js";
 import * as data from "./data.js";
@@ -40,7 +40,7 @@ function leaveEditing() {
 }
 
 function openRenameModal(cuentaId) {
-  const cuenta = cuentaById(cuentaId) ?? state.cuenta;
+  const cuenta = cuentaDe(cuentaId);
   openModal({
     title: cuentaId === state.userId ? "Editar mi nombre" : "Editar nombre",
     body: `<div class="field"><label for="mNombre">Nombre completo</label><input type="text" id="mNombre" value="${esc(cuenta?.nombre)}"></div>`,
@@ -91,6 +91,16 @@ const clicks = {
   pdfPropio({ id }) {
     const entrega = entregasOf(state.cuenta)[id];
     if (entrega) savePdf([{ tarea: tareaById(id), entrega }], pdfName(tareaById(id), entrega));
+  },
+  perfil({ id }) {
+    goTo("profile", { perfilId: id });
+    render();
+    scrollTop();
+  },
+  volverCuentas() {
+    state.tab = "cuentas";
+    goTo("home");
+    render();
   },
   renombrar({ id }) {
     openRenameModal(id);
@@ -144,9 +154,9 @@ const clicks = {
   },
   verEntrega({ id, tarea: tareaId }) {
     const tarea = tareaById(tareaId);
-    const entrega = entregasOf(cuentaById(id))[tareaId];
+    const entrega = entregasOf(cuentaDe(id))[tareaId];
     openModal({
-      title: entrega.titulo || tarea.titulo,
+      title: entrega.titulo || tarea?.titulo,
       body: entregaDetalle(tarea, entrega),
       actions: [
         { label: "Cerrar" },
@@ -156,7 +166,7 @@ const clicks = {
   },
   pdfEntrega({ id, tarea: tareaId }) {
     const tarea = tareaById(tareaId);
-    const entrega = entregasOf(cuentaById(id))[tareaId];
+    const entrega = entregasOf(cuentaDe(id))[tareaId];
     return savePdf([{ tarea, entrega }], pdfName(tarea, entrega));
   },
   pdfTodas() {
@@ -179,7 +189,9 @@ const clicks = {
       text: `Se borrará el perfil de ${cuenta.nombre || "esta persona"} y todas sus entregas. No se puede deshacer.`,
       label: "Eliminar",
       run: async () => {
-        if (await attempt(() => data.eliminarCuenta(id), "No se pudo eliminar.")) toast("Cuenta eliminada");
+        if (!(await attempt(() => data.eliminarCuenta(id), "No se pudo eliminar."))) return;
+        toast("Cuenta eliminada");
+        if (state.view === "profile") clicks.volverCuentas();
       },
     });
   },

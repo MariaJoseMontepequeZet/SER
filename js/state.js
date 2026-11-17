@@ -27,6 +27,7 @@ export const state = {
 export const isAdminMode = () => state.isAdmin && !state.asStudent;
 export const tareaById = (id) => state.tareas.find((tarea) => tarea.id === id);
 export const cuentaById = (id) => state.cuentas.find((cuenta) => cuenta.id === id);
+export const cuentaDe = (id) => (id === state.userId ? state.cuenta : cuentaById(id));
 export const isBlocked = (id) => Boolean(state.bloqueos[id]);
 
 export function entregasDeTarea(tareaId) {

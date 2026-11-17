@@ -1,6 +1,7 @@
 import { state, tareaById, isBlocked } from "../state.js";
 import { esc, fmtDate, todayStr } from "../utils.js";
 import { entregasOf, firstName, isPastDue } from "../domain.js";
+import { renderProfile } from "./profile.js";
 import { entregaDetalle, estadoChip, mutedCard, mutedText, notice, pluralize } from "./components.js";
 
 export function renderStudent() {
@@ -12,6 +13,7 @@ export function renderStudent() {
   }
   if (state.view === "form" && state.tareaId) return renderForm();
   if (state.view === "ver" && state.tareaId) return renderEntrega();
+  if (state.view === "profile") return renderProfile(state.cuenta);
   return renderHome();
 }
 
@@ -64,7 +66,7 @@ function renderHome() {
   return `<div class="card">
     <div class="row between">
       <div><h2>Hola, ${esc(firstName(state.cuenta.nombre))}</h2><div class="muted">${estado}</div></div>
-      <button class="ghost" data-act="renombrar" data-id="${esc(state.userId)}">Editar mi nombre</button>
+      <button class="ghost" data-act="perfil" data-id="${esc(state.userId)}">Mi perfil</button>
     </div>
     <div class="hint">Tus respuestas solo las ve la administración del grupo.</div>
   </div>
