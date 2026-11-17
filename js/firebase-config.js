@@ -5,4 +5,4 @@ export const firebaseConfig = {
   appId: "1:1059522908710:web:edfc9c1c0d074ca1c58ce7",
 };
 
-export const adminEmails = [];
+export const adminEmails = ["majozet8@gmail.com"];
