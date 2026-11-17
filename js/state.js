@@ -22,6 +22,7 @@ export const state = {
   draft: null,
   form: null,
   slow: false,
+  lastError: null,
   fatal: null,
 };
 
