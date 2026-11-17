@@ -37,6 +37,8 @@ export function renderEditor() {
     <div class="field"><label for="eInstr">Instrucciones</label><textarea id="eInstr" data-d="instrucciones">${esc(draft.instrucciones)}</textarea></div>
     <div class="row">
       <div class="field grow"><label for="eFecha">Fecha límite</label><input type="date" id="eFecha" data-d="fechaLimite" value="${esc(draft.fechaLimite)}"></div>
+      <div class="field grow"><label for="eHora">Hora límite <span class="hint">(opcional)</span></label><input type="time" id="eHora" data-d="horaLimite" value="${esc(draft.horaLimite)}"></div>
+      <label class="switch"><input type="checkbox" id="eCierre" data-d="cierreAutomatico" ${draft.cierreAutomatico ? "checked" : ""}> Cerrar al vencer</label>
       <label class="switch"><input type="checkbox" id="eActiva" data-d="activa" ${draft.activa ? "checked" : ""}> Visible para estudiantes</label>
     </div>
     <p class="hint flush">El nombre completo y la fecha se piden siempre. Aquí armás las preguntas de la resolución.</p>

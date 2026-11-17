@@ -1,11 +1,11 @@
 import { esc, fmtDate, fmtDateTime } from "../utils.js";
-import { isPastDue, preguntasOf } from "../domain.js";
+import { isOpen, isPastDue, preguntasOf } from "../domain.js";
 
 export const chip = (kind, label) => `<span class="chip ${kind}">${esc(label)}</span>`;
 
 export function estadoChip(tarea, entrega) {
   if (entrega) return entrega.tarde ? chip("warn", "Entregada tarde") : chip("ok", "Entregada");
-  if (!tarea?.activa) return chip("bad", "Cerrada");
+  if (!isOpen(tarea)) return chip("bad", "Cerrada");
   if (isPastDue(tarea)) return chip("bad", "Vencida");
   return chip("warn", "Pendiente");
 }
