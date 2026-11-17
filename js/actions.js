@@ -68,6 +68,10 @@ function movePregunta(index, delta) {
 }
 
 const clicks = {
+  async salir() {
+    await state.signOut();
+    location.reload();
+  },
   inicio() {
     state.editing = false;
     state.form = null;
@@ -214,7 +218,7 @@ const submits = {
       toast("¡Listo, perfil creado!");
     } catch (error) {
       toast(
-        error?.code === "invalid_argument"
+        ["invalid_argument", "permission-denied"].includes(error?.code)
           ? "No tenés permiso para registrarte. Pedile a la admin acceso de Colaborador."
           : "No se pudo guardar. Intentá de nuevo.",
       );
