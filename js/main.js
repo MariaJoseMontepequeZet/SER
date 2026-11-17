@@ -1,16 +1,10 @@
-"use strict";
+import { esc, todayStr, fmtDate, fmtDT, slug, uidq } from "./utils.js";
 const S = {
   db:null, user:null, uid:null, isAdmin:false, asStudent:false, downloads:null,
   tareas:[], tareasLoaded:false, cuenta:undefined, cuentas:[], bloqueos:{}, profiles:{},
   view:"home", tab:"tareas", sel:null, editing:false, draft:null, form:null, slow:false, fatal:null
 };
 const app = document.getElementById("app");
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const todayStr = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
-const fmtDate = s => { if(!s) return "—"; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("es-GT",{day:"numeric",month:"short",year:"numeric"}); };
-const fmtDT = iso => iso ? new Date(iso).toLocaleString("es-GT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
-const slug = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50) || "tarea";
-const uidq = () => Math.random().toString(36).slice(2,9);
 
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2800); }
 
