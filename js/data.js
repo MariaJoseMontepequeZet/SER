@@ -4,7 +4,7 @@ import { entregaPayload, entregasOf, tareaPayload } from "./domain.js";
 export class ConnectionError extends Error {}
 
 const MESSAGES = {
-  runtime: "Esta página tiene que abrirse desde claude.ai con tu cuenta iniciada.",
+  config: "Falta configurar Firebase en js/firebase-config.js.",
   connection:
     "No se pudo conectar. Asegurate de haber iniciado sesión en Claude y de que la admin te haya compartido la página con permiso de Colaborador (Contributor).",
   identity: "No pudimos identificar tu cuenta. Iniciá sesión en Claude y volvé a abrir el enlace.",
@@ -21,12 +21,21 @@ const withId = (doc) => ({ id: doc.id, ...doc.data() });
 
 export const revokedMessage = () => MESSAGES.revoked;
 
+async function loadRuntime() {
+  if (window.claude?.use) return window.claude;
+  const { createRuntime, isConfigured } = await import("./backend/firebase.js");
+  if (!isConfigured()) fail("config");
+  const services = await createRuntime();
+  state.signOut = services.signOut;
+  return { use: async (name) => services[name] };
+}
+
 export async function connect() {
-  if (!window.claude?.use) fail("runtime");
+  const runtime = await loadRuntime();
   const [db, user, downloads] = await Promise.all([
-    window.claude.use("db"),
-    window.claude.use("user"),
-    window.claude.use("downloads"),
+    runtime.use("db"),
+    runtime.use("user"),
+    runtime.use("downloads"),
   ]);
   if (!db || !user) fail("connection");
 

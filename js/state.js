@@ -4,6 +4,7 @@ export const state = {
   db: null,
   user: null,
   downloads: null,
+  signOut: null,
   userId: null,
   isAdmin: false,
   asStudent: false,
