@@ -26,7 +26,7 @@ function body() {
   if (!state.db || (!state.tareasLoaded && state.cuenta === undefined)) {
     return mutedCard(
       state.slow
-        ? "La conexión está tardando. Revisá tu internet; la página sigue intentando."
+        ? `La conexión está tardando. Revisá tu internet; la página sigue intentando.${state.lastError ? ` (error: ${state.lastError})` : ""}`
         : "Cargando tus tareas…",
     );
   }

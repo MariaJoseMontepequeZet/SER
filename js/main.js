@@ -30,6 +30,8 @@ async function boot() {
     },
     onError(error) {
       clearTimeout(slowTimer);
+      console.error(error);
+      state.lastError = error?.code || error?.message || "desconocido";
       if (error?.code === "revoked") state.fatal = revokedMessage();
       else state.slow = true;
       render();
