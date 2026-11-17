@@ -1,6 +1,6 @@
 import { state, tareaById, isBlocked } from "../state.js";
-import { esc, fmtDate, todayStr } from "../utils.js";
-import { entregasOf, firstName, isPastDue } from "../domain.js";
+import { esc, todayStr } from "../utils.js";
+import { deadlineLabel, entregasOf, firstName, isOpen, isPastDue } from "../domain.js";
 import { renderProfile } from "./profile.js";
 import { entregaDetalle, estadoChip, mutedCard, mutedText, notice, pluralize } from "./components.js";
 
@@ -43,10 +43,10 @@ function tareaCard(tarea) {
   const id = esc(tarea.id);
   return `<div class="card">
     <div class="row between"><h3>${esc(tarea.titulo)}</h3>${estadoChip(tarea, entrega)}</div>
-    <div class="muted small">Fecha límite: ${fmtDate(tarea.fechaLimite)} · ${(tarea.preguntas || []).length} preguntas</div>
+    <div class="muted small">Fecha límite: ${deadlineLabel(tarea)} · ${(tarea.preguntas || []).length} preguntas</div>
     <div class="row">
       ${entrega ? `<button data-act="ver" data-id="${id}">Ver mi entrega</button>` : ""}
-      ${tarea.activa ? `<button class="${entrega ? "" : "primary"}" data-act="resolver" data-id="${id}">${entrega ? "Editar" : "Resolver tarea"}</button>` : ""}
+      ${isOpen(tarea) ? `<button class="${entrega ? "" : "primary"}" data-act="resolver" data-id="${id}">${entrega ? "Editar" : "Resolver tarea"}</button>` : ""}
       ${entrega ? `<button data-act="pdfPropio" data-id="${id}">Descargar PDF</button>` : ""}
     </div>
   </div>`;
@@ -54,8 +54,8 @@ function tareaCard(tarea) {
 
 function renderHome() {
   const entregas = entregasOf(state.cuenta);
-  const visibles = state.tareas.filter((tarea) => tarea.activa || entregas[tarea.id]);
-  const pendientes = visibles.filter((tarea) => tarea.activa && !entregas[tarea.id]).length;
+  const visibles = state.tareas.filter((tarea) => isOpen(tarea) || entregas[tarea.id]);
+  const pendientes = visibles.filter((tarea) => isOpen(tarea) && !entregas[tarea.id]).length;
   const estado = pendientes
     ? `Tenés ${pluralize(pendientes, "tarea pendiente", "tareas pendientes")}.`
     : "Estás al día con tus tareas.";
@@ -103,7 +103,7 @@ function renderForm() {
     </div>
     <h2>${esc(tarea.titulo)}</h2>
     ${tarea.instrucciones ? `<div class="answer">${esc(tarea.instrucciones)}</div>` : ""}
-    <div class="muted small">Fecha límite: ${fmtDate(tarea.fechaLimite)}</div>
+    <div class="muted small">Fecha límite: ${deadlineLabel(tarea)}</div>
     ${isPastDue(tarea) ? notice("La fecha límite ya pasó. Podés entregar, pero quedará marcada como tarde.") : ""}
     <div class="field"><label for="fNombre">Nombre completo</label><input type="text" id="fNombre" value="${esc(form.nombre)}" required></div>
     <div class="field"><label for="fFecha">Fecha</label><input type="date" id="fFecha" value="${esc(form.fecha)}" required></div>
@@ -127,7 +127,7 @@ function renderEntrega() {
     ${entregaDetalle(tarea, entrega)}
     <div class="row">
       <button class="primary" data-act="pdfPropio" data-id="${id}">Descargar PDF</button>
-      ${tarea?.activa ? `<button data-act="resolver" data-id="${id}">Editar</button>` : ""}
+      ${isOpen(tarea) ? `<button data-act="resolver" data-id="${id}">Editar</button>` : ""}
     </div>
   </div>`;
 }

@@ -4,6 +4,7 @@ import { bindEvents } from "./actions.js";
 import { render, rerender } from "./app.js";
 
 const SLOW_CONNECTION_MS = 10000;
+const REFRESH_MS = 30000;
 
 async function boot() {
   bindEvents(document.getElementById("app"));
@@ -21,6 +22,8 @@ async function boot() {
     render();
     return;
   }
+
+  setInterval(rerender, REFRESH_MS);
 
   watch({
     onChange: rerender,

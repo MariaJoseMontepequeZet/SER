@@ -1,6 +1,6 @@
 import { state, tareaById, isBlocked, entregasDeTarea, cuentaDe } from "../state.js";
 import { esc, fmtDate, fmtDateTime } from "../utils.js";
-import { entregasOf } from "../domain.js";
+import { deadlineLabel, entregasOf, isOpen } from "../domain.js";
 import { chip, mutedText, pluralize } from "./components.js";
 import { renderEditor } from "./editor.js";
 import { renderProfile } from "./profile.js";
@@ -37,8 +37,8 @@ function tareaItem(tarea) {
   const id = esc(tarea.id);
   const entregas = entregasDeTarea(tarea.id).length;
   return `<div class="q">
-    <div class="row between"><h3>${esc(tarea.titulo)}</h3>${chip(tarea.activa ? "ok" : "bad", tarea.activa ? "Activa" : "Cerrada")}</div>
-    <div class="muted small">Fecha límite ${fmtDate(tarea.fechaLimite)} · ${(tarea.preguntas || []).length} preguntas · ${pluralize(entregas, "entrega", "entregas")}</div>
+    <div class="row between"><h3>${esc(tarea.titulo)}</h3>${chip(isOpen(tarea) ? "ok" : "bad", isOpen(tarea) ? "Activa" : "Cerrada")}</div>
+    <div class="muted small">Fecha límite ${deadlineLabel(tarea)} · ${(tarea.preguntas || []).length} preguntas · ${pluralize(entregas, "entrega", "entregas")}</div>
     <div class="row">
       <button data-act="verEntregas" data-id="${id}">Ver entregas</button>
       <button data-act="editarTarea" data-id="${id}">Editar</button>
@@ -51,7 +51,7 @@ function tareaItem(tarea) {
 
 function tabTareas() {
   const lista = state.tareas.map(tareaItem).join("");
-  return `<div class="row between"><h2>Tareas</h2><button class="primary" data-act="nuevaTarea">+ Nueva tarea</button></div>
+  return `<div class="row between"><h2>Tareas</h2><div class="row"><button data-act="plantillas">Plantillas</button><button class="primary" data-act="nuevaTarea">+ Nueva tarea</button></div></div>
     ${lista || mutedText('No hay tareas todavía. Creá la primera con "Nueva tarea".')}`;
 }
 

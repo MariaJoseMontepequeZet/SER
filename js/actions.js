@@ -1,6 +1,7 @@
 import { state, goTo, tareaById, cuentaById, cuentaDe, entregasDeTarea } from "./state.js";
 import { esc, slug } from "./utils.js";
-import { draftFrom, entregasOf, newPregunta } from "./domain.js";
+import { draftFrom, entregasOf, isOpen, newPregunta } from "./domain.js";
+import { plantillas } from "./plantillas.js";
 import * as data from "./data.js";
 import { downloadPdf, PdfUnavailableError } from "./pdf.js";
 import { confirmBox, openModal, toast } from "./ui.js";
@@ -81,6 +82,7 @@ const clicks = {
   resolver({ id }) {
     const tarea = tareaById(id);
     if (!tarea) return;
+    if (!isOpen(tarea)) return toast("Esta tarea ya está cerrada.");
     state.form = initialForm(state.cuenta, id);
     state.editing = true;
     goTo("form", { tareaId: id });
@@ -112,6 +114,20 @@ const clicks = {
   pestana({ id }) {
     state.tab = id;
     render();
+  },
+  plantillas() {
+    openModal({
+      title: "Plantillas",
+      body: '<p class="flush">Elegí una plantilla para crear la tarea con las preguntas ya armadas. Podés editarla antes de guardar.</p>',
+      actions: [
+        { label: "Cancelar" },
+        ...plantillas.map((plantilla) => ({
+          label: plantilla.nombre,
+          kind: "primary",
+          run: () => startEditor(plantilla.crear()),
+        })),
+      ],
+    });
   },
   nuevaTarea() {
     startEditor(draftFrom(null));
@@ -228,6 +244,7 @@ const submits = {
   async entForm() {
     const tarea = tareaById(state.tareaId);
     const { form } = state;
+    if (!isOpen(tarea)) return toast("La tarea ya cerró y no recibe más entregas.");
     if (!form.nombre.trim()) return toast("Falta tu nombre completo.");
     if (!form.fecha) return toast("Falta la fecha.");
     const faltante = (tarea.preguntas || []).find(

@@ -1,8 +1,20 @@
-import { todayStr, uid } from "./utils.js";
+import { fmtDate, fmtTime, uid } from "./utils.js";
 
 export const entregasOf = (cuenta) => cuenta?.entregas ?? {};
 
-export const isPastDue = (tarea) => Boolean(tarea?.fechaLimite) && todayStr() > tarea.fechaLimite;
+export function isPastDue(tarea) {
+  if (!tarea?.fechaLimite) return false;
+  const time = tarea.horaLimite ? `${tarea.horaLimite}:00` : "23:59:59";
+  return new Date() > new Date(`${tarea.fechaLimite}T${time}`);
+}
+
+export const isOpen = (tarea) => Boolean(tarea?.activa) && !(tarea.cierreAutomatico && isPastDue(tarea));
+
+export function deadlineLabel(tarea) {
+  if (!tarea?.fechaLimite) return "—";
+  const time = fmtTime(tarea.horaLimite);
+  return time ? `${fmtDate(tarea.fechaLimite)}, ${time}` : fmtDate(tarea.fechaLimite);
+}
 
 export const firstName = (name) => String(name || "").split(" ")[0];
 
@@ -14,7 +26,7 @@ export const newPregunta = () => ({ id: uid(), label: "", ayuda: "", tipo: "larg
 export function resumenDe(cuenta, tareas) {
   const entregas = Object.values(entregasOf(cuenta));
   const tarde = entregas.filter((entrega) => entrega.tarde).length;
-  const pendientes = tareas.filter((tarea) => tarea.activa && !entregasOf(cuenta)[tarea.id]).length;
+  const pendientes = tareas.filter((tarea) => isOpen(tarea) && !entregasOf(cuenta)[tarea.id]).length;
   return { total: entregas.length, tarde, aTiempo: entregas.length - tarde, pendientes };
 }
 
@@ -26,6 +38,8 @@ export function draftFrom(tarea, { copy = false } = {}) {
       titulo: "",
       instrucciones: "",
       fechaLimite: "",
+      horaLimite: "",
+      cierreAutomatico: false,
       activa: true,
       preguntas: [newPregunta()],
       creada: null,
@@ -37,6 +51,8 @@ export function draftFrom(tarea, { copy = false } = {}) {
     titulo: (copy ? "Copia de " : "") + (tarea.titulo || ""),
     instrucciones: tarea.instrucciones || "",
     fechaLimite: tarea.fechaLimite || "",
+    horaLimite: tarea.horaLimite || "",
+    cierreAutomatico: Boolean(tarea.cierreAutomatico),
     activa: copy ? false : Boolean(tarea.activa),
     preguntas: (tarea.preguntas || []).map((pregunta) => ({ ...pregunta })),
     creada: copy ? null : tarea.creada,
@@ -57,6 +73,8 @@ export function tareaPayload(draft) {
     titulo: draft.titulo.trim(),
     instrucciones: draft.instrucciones.trim(),
     fechaLimite: draft.fechaLimite || "",
+    horaLimite: draft.fechaLimite ? draft.horaLimite || "" : "",
+    cierreAutomatico: Boolean(draft.fechaLimite && draft.cierreAutomatico),
     activa: Boolean(draft.activa),
     preguntas,
     creada: draft.creada || new Date().toISOString(),
