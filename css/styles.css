@@ -61,6 +61,7 @@ select.auto{width:auto}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px}
 .tabs button{border-color:transparent;background:transparent;color:var(--muted)}
 .tabs button[aria-selected=true]{background:var(--soft);color:var(--accent)}
+.panel{display:grid;gap:12px}
 .table-wrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:.92rem}
 th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}

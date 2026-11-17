@@ -17,7 +17,7 @@ export function renderAdmin() {
 
   const tabs = TABS.map(
     ([key, label]) =>
-      `<button role="tab" aria-selected="${state.tab === key}" data-act="pestana" data-id="${key}">${label}</button>`,
+      `<button role="tab" id="tab-${key}" aria-controls="panel-${key}" aria-selected="${state.tab === key}" data-act="pestana" data-id="${key}">${label}</button>`,
   ).join("");
   const panels = { tareas: tabTareas, entregas: tabEntregas, cuentas: tabCuentas };
 
@@ -29,7 +29,8 @@ export function renderAdmin() {
     <div class="card stat"><span class="hint">Cuentas activas</span><b>${activas}</b></div>
     <div class="card stat"><span class="hint">Entregas recibidas</span><b>${totalEntregas}</b></div>
   </div>
-  <div class="card"><div class="tabs" role="tablist">${tabs}</div>${panels[state.tab]()}</div>`;
+  <div class="card"><div class="tabs" role="tablist" aria-label="Secciones">${tabs}</div>
+    <div role="tabpanel" id="panel-${state.tab}" aria-labelledby="tab-${state.tab}" class="panel">${panels[state.tab]()}</div></div>`;
 }
 
 function tareaItem(tarea) {
