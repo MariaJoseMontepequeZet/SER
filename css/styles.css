@@ -30,10 +30,16 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-weight:700}
 .brand small{display:block;color:var(--muted);font-size:.8rem;line-height:1.2}
 .muted{color:var(--muted)}
+.flush{margin:0}
+.small{font-size:.9rem}
+.strong{font-weight:700}
+.spaced{margin-top:6px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px}
 .list{display:grid;gap:12px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .between{justify-content:space-between}
+.end{justify-content:flex-end}
+.grow{flex:1;min-width:180px}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
 .chip.ok{background:var(--ok-bg);color:var(--ok)}
 .chip.warn{background:var(--warn-bg);color:var(--warn)}
@@ -51,6 +57,7 @@ label{font-weight:700;font-size:.92rem}
 .hint{font-size:.85rem;color:var(--muted);font-weight:400}
 input[type=text],input[type=date],textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
 textarea{min-height:110px;resize:vertical}
+select.auto{width:auto}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px}
 .tabs button{border-color:transparent;background:transparent;color:var(--muted)}
 .tabs button[aria-selected=true]{background:var(--soft);color:var(--accent)}
