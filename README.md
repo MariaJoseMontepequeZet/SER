@@ -25,7 +25,13 @@ js/views/           Vistas: student, admin, editor, profile, components
 
 ## Desarrollo
 
-Es una página estática con módulos ES, sin paso de compilación. Para verla en local sirve la carpeta con cualquier servidor estático; el runtime `window.claude` solo existe dentro de claude.ai, por lo que fuera de ahí hace falta simularlo.
+Es una página estática con módulos ES, sin paso de compilación. Con la extensión Live Server de VS Code, abrí `index.html` con "Open with Live Server".
+
+Fuera de claude.ai no existe `window.claude`, así que en `localhost` se carga `dev/mock-claude.js`, que simula la base de datos, el usuario y las descargas guardando los datos en `localStorage`. No hace nada en otros dominios.
+
+- `index.html`: entras como estudiante.
+- `index.html?admin=1`: entras como administración.
+- `index.html?user=ana`: entras como otra persona, con su propio perfil.
 
 ## Flujo de trabajo
 
