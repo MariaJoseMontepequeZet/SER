@@ -1,5 +1,5 @@
 import { fmtDate, fmtDateTime } from "./utils.js";
-import { preguntasOf } from "./domain.js";
+import { deadlineLabel, preguntasOf } from "./domain.js";
 
 const ACCENT = [13, 122, 104];
 const INK = [22, 35, 42];
@@ -16,7 +16,7 @@ function drawCover(doc, { tarea, entrega }, width, textWidth) {
   doc.text(doc.splitTextToSize(entrega.titulo || tarea?.titulo || "Tarea", textWidth)[0], MARGIN, 14);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text(`Buzón de Tareas  ·  Fecha límite: ${fmtDate(tarea?.fechaLimite)}`, MARGIN, 22);
+  doc.text(`Buzón de Tareas  ·  Fecha límite: ${deadlineLabel(tarea)}`, MARGIN, 22);
 }
 
 function drawEntrega(doc, item) {

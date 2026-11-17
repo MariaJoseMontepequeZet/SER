@@ -9,6 +9,18 @@ export function todayStr() {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
+export function tomorrowStr() {
+  const next = new Date();
+  next.setDate(next.getDate() + 1);
+  return `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}`;
+}
+
+export function fmtTime(value) {
+  if (!value) return "";
+  const [hours, minutes] = value.split(":").map(Number);
+  return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString("es-GT", { hour: "numeric", minute: "2-digit" });
+}
+
 export function fmtDate(value) {
   if (!value) return "—";
   const [year, month, day] = value.split("-").map(Number);
