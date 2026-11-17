@@ -1,4 +1,6 @@
 import { esc, todayStr, fmtDate, fmtDT, slug, uidq } from "./utils.js";
+import { toast, openModal, closeModal, confirmBox } from "./ui.js";
+import { buildPdf } from "./pdf.js";
 const S = {
   db:null, user:null, uid:null, isAdmin:false, asStudent:false, downloads:null,
   tareas:[], tareasLoaded:false, cuenta:undefined, cuentas:[], bloqueos:{}, profiles:{},
@@ -6,23 +8,6 @@ const S = {
 };
 const app = document.getElementById("app");
 
-function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2800); }
-
-function openModal({title, body, actions}){
-  const root=document.getElementById("modal-root");
-  root.innerHTML=`<div class="modal-back" data-close="1"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
-    <h2 id="mtitle">${esc(title)}</h2><div>${body}</div>
-    <div class="row" style="justify-content:flex-end" id="mact"></div></div></div>`;
-  const act=root.querySelector("#mact");
-  (actions||[{label:"Cerrar"}]).forEach(a=>{
-    const b=document.createElement("button"); b.textContent=a.label; if(a.kind) b.className=a.kind;
-    b.onclick=async()=>{ if(a.fn){ b.disabled=true; const keep=await a.fn(root); b.disabled=false; if(keep===false) return; } closeModal(); };
-    act.appendChild(b);
-  });
-  root.querySelector(".modal-back").addEventListener("click",e=>{ if(e.target.dataset.close) closeModal(); });
-}
-function closeModal(){ document.getElementById("modal-root").innerHTML=""; }
-function confirmBox(title, text, label, fn){ openModal({title, body:`<p style="margin:0">${esc(text)}</p>`, actions:[{label:"Cancelar"},{label, kind:"primary", fn}]}); }
 
 /* ---------- Datos ---------- */
 const adminMode = () => S.isAdmin && !S.asStudent;
@@ -68,36 +53,6 @@ async function init(){
 }
 
 /* ---------- PDF ---------- */
-function buildPdf(items){
-  const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:"mm",format:"letter"});
-  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=18, TW=W-M*2;
-  items.forEach((it,idx)=>{
-    if(idx>0) doc.addPage();
-    const {t,e}=it; let y=0;
-    doc.setFillColor(13,122,104); doc.rect(0,0,W,30,"F");
-    doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(16);
-    doc.text(doc.splitTextToSize(e.titulo || t?.titulo || "Tarea", TW)[0], M, 14);
-    doc.setFont("helvetica","normal"); doc.setFontSize(10);
-    doc.text("Buzón de Tareas  ·  Fecha límite: "+fmtDate(t?.fechaLimite), M, 22);
-    y=42; doc.setTextColor(22,35,42);
-    const line=(label,val)=>{ doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.text(label,M,y); doc.setFont("helvetica","normal"); doc.text(String(val||"—"),M+42,y); y+=7; };
-    line("Nombre completo:", e.nombre); line("Fecha:", fmtDate(e.fecha)); line("Entregada:", fmtDT(e.enviada)+(e.tarde?"  (tarde)":""));
-    y+=3; doc.setDrawColor(213,223,219); doc.line(M,y,W-M,y); y+=9;
-    const qs=(e.preguntas && e.preguntas.length ? e.preguntas : (t?.preguntas||[]));
-    const ensure=h=>{ if(y+h>H-18){ doc.addPage(); y=20; } };
-    qs.forEach((q,i)=>{
-      doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(13,122,104);
-      const lab=doc.splitTextToSize((i+1)+". "+q.label, TW); ensure(lab.length*6+6); doc.text(lab,M,y); y+=lab.length*6+1;
-      doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(22,35,42);
-      const ans=String((e.respuestas||{})[q.id]||"(sin respuesta)");
-      ans.split("\n").forEach(par=>{ const ls=doc.splitTextToSize(par||" ", TW); ls.forEach(l=>{ ensure(6); doc.text(l,M,y); y+=5.6; }); });
-      y+=6;
-    });
-  });
-  const n=doc.getNumberOfPages();
-  for(let p=1;p<=n;p++){ doc.setPage(p); doc.setFontSize(9); doc.setTextColor(120,130,130); doc.text("Página "+p+" de "+n, W-M, H-10, {align:"right"}); }
-  return doc.output("blob");
-}
 async function savePdf(items, filename){
   if(!S.downloads){ toast("La descarga no está disponible en esta vista."); return; }
   if(!window.jspdf){ toast("No cargó el generador de PDF. Recargá la página."); return; }
